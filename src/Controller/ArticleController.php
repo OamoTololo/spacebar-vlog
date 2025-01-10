@@ -9,11 +9,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class ArticleController extends AbstractController
 {
     /**
-     * @Route("/")
+     * @Route("/", name="app_homepage")
      */
     public function homepage()
     {
-        return new Response('Hello World');
+        return $this->render('article/homepage.html.twig');
     }
 
     /**
@@ -26,6 +26,7 @@ class ArticleController extends AbstractController
             'Whoooo! I\'m going on an all-asteroids diet.',
             'I like bacon too! Buy some from my site! oamogetswemgidi.com',
         ];
+
         return $this->render('article/show.html.twig', [
             'title' => ucwords(str_replace('-', ' ', $slug)),
             'comments' => $comments,
