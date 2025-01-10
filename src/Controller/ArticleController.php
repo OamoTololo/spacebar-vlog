@@ -29,7 +29,18 @@ class ArticleController extends AbstractController
 
         return $this->render('article/show.html.twig', [
             'title' => ucwords(str_replace('-', ' ', $slug)),
+            'slug' => $slug,
             'comments' => $comments,
         ]);
+    }
+
+    /**
+     * @Route("/news/{slug}/heart", name="article_toggle_heart", methods={"POST"})
+     */
+    public function toggleArticleHeart($slug)
+    {
+        // TODO - actually heart/un-heart the article
+
+        return $this->json(['hearts' => rand(5, 100)]);
     }
 }
