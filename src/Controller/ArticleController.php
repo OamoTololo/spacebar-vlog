@@ -22,7 +22,7 @@ class ArticleController extends AbstractController
     /**
      * @Route("/news/{slug}")
      */
-    public function show($slug, MarkdownParserInterface $markdownParser, AdapterInterface $cache)
+    public function show($slug, MarkdownParserInterface $markdown, AdapterInterface $cache)
     {
         $comments = [
             'I ate a normal rock once. It did not taste like bacon.',
@@ -51,12 +51,13 @@ EOF;
         $item = $cache->getItem('markdown_'.md5($articleContent));
 
         if (!$item->isHit()) {
-            $item->set($articleContent);
+            $item->set($markdown->transformMarkdown($articleContent));
             $cache->save($item);
         }
 
         //$articleContent = $markdownParser->transformMarkdown($articleContent);
         $articleContent = $item->get();
+        dump($markdown);die;
 
 
         return $this->render('article/show.html.twig', [
