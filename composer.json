@@ -24,7 +24,8 @@
     "config": {
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
-            "symfony/flex": true
+            "symfony/flex": true,
+            "phpro/grumphp": true
         },
         "preferred-install": {
             "*": "dist"
@@ -72,6 +73,7 @@
         }
     },
     "require-dev": {
+        "phpro/grumphp": "^1.5",
         "symfony/debug-bundle": "4.4.*",
         "symfony/maker-bundle": "*",
         "symfony/monolog-bundle": "^3.0",
