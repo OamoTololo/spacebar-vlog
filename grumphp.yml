@@ -1,13 +1,5 @@
 grumphp:
     tasks:
-        git_commit_message:
-            matchers:
-                - '/^[A-Z]{3,}-\d+: .+/' # Matches messages like "PROJ-123: Add new feature"
-                - '/^Feature: .+/' # Matches messages like "Feature: Implement user login"
-                - '/^Bugfix: .+/' # Matches messages like "Bugfix: Fix login error"
-                - '/^Chore: .+/' # Matches messages like "Chore: Update dependencies"
-            case_insensitive: true # Allows both uppercase and lowercase match
-            multiline: false # Ensures single-line commit messages
         git_blacklist:
             keywords:
                 - "die("
