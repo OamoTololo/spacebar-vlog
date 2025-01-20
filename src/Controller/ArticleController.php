@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
+use App\Service\MarkdownHelper;
 use Knp\Bundle\MarkdownBundle\MarkdownParserInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ArticleController extends AbstractController
@@ -22,7 +22,7 @@ class ArticleController extends AbstractController
     /**
      * @Route("/news/{slug}")
      */
-    public function show($slug, MarkdownParserInterface $markdown, AdapterInterface $cache)
+    public function show($slug, MarkdownHelper $markdownHelper)
     {
         $comments = [
             'I ate a normal rock once. It did not taste like bacon.',
@@ -49,16 +49,7 @@ cow est ribeye adipisicing. Pig hamburger pork belly enim. Do porchetta minim ca
 fugiat.
 EOF;
 
-        $item = $cache->getItem('markdown_'.md5($articleContent));
-
-        if (!$item->isHit()) {
-            $item->set($markdown->transformMarkdown($articleContent));
-            $cache->save($item);
-        }
-
-        //$articleContent = $markdownParser->transformMarkdown($articleContent);
-        $articleContent = $item->get();
-
+        $articleContent = $markdownHelper->parse($articleContent);
 
         return $this->render('article/show.html.twig', [
             'title' => ucwords(str_replace('-', ' ', $slug)),
@@ -71,14 +62,14 @@ EOF;
     /**
      * @Route("/news/{slug}/heart", name="article_toggle_heart", methods={"POST"})
      */
-    public function toggleArticleHeart($slug, LoggerInterface  $logger)
+    public function toggleArticleHeart($slug, LoggerInterface $logger)
     {
         // TODO - actually heart/un-heart the article
 
         $logger->info('Article is being hearted.');
 
         return $this->json([
-            'hearts' => rand(5, 100)
+            'hearts' => rand(5, 100),
         ]);
     }
 }
