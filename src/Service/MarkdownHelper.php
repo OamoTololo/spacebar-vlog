@@ -3,21 +3,43 @@
 namespace App\Service;
 
 use Knp\Bundle\MarkdownBundle\MarkdownParserInterface;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Cache\Adapter\AdapterInterface;
 
 class MarkdownHelper
 {
-    protected AdapterInterface $cache;
-    protected MarkdownParserInterface $markdown;
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
-    public function __construct($cache, $markdown)
-    {
+    /**
+     * @var bool
+     */
+    private $isDebug;
+
+    public function __construct(
+        AdapterInterface $cache,
+        MarkdownParserInterface $markdown,
+        LoggerInterface $markdownLogger,
+        bool $isDebug
+    ) {
         $this->cache = $cache;
         $this->markdown = $markdown;
+        $this->logger = $markdownLogger;
+        $this->isDebug = $isDebug;
     }
 
     public function parse(string $source): string
     {
+        if (false !== stripos($source, 'bacon')) {
+            $this->logger->info('The are talking about bacon again!');
+        }
+
+        if ($this->isDebug) {
+            return $this->markdown->transformMarkdown($source);
+        }
+
         $item = $this->cache->getItem('markdown_'.md5($source));
 
         if (!$item->isHit()) {
