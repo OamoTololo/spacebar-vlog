@@ -3,14 +3,20 @@
 namespace App\Controller;
 
 use App\Service\MarkdownHelper;
-use Knp\Bundle\MarkdownBundle\MarkdownParserInterface;
+use Nexy\Slack\Client;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Cache\Adapter\AdapterInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ArticleController extends AbstractController
 {
+    private $isDebug;
+
+    public function __construct(bool $isDebug)
+    {
+        $this->isDebug = $isDebug;
+    }
+
     /**
      * @Route("/", name="app_homepage")
      */
