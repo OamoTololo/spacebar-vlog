@@ -6,6 +6,7 @@ use App\Entity\Article;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\OptimisticLockException;
 use Doctrine\ORM\ORMException;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -50,13 +51,13 @@ class ArticleRepository extends ServiceEntityRepository
     /**
      * @return Article[] Returns an array of Article objects
      */
-    public function findAlLPublishedOrderByNewst($value)
+    public function findAlLPublishedOrderByNewst()
     {
-        return $this->createQueryBuilder('a')
-            ->andWhere('a.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('a.id', 'ASC')
-            ->setMaxResults(10)
+        $queryBuilder = $this->createQueryBuilder('article');
+
+        return $this->addIsPublishedQueryBuilder()
+            ->andWhere('article.publishedAt IS NOT NULL')
+            ->orderBy('article.publishedAt', 'DESC')
             ->getQuery()
             ->getResult()
         ;
@@ -73,4 +74,14 @@ class ArticleRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function addIsPublishedQueryBuilder(QueryBuilder $queryBuilder = null): QueryBuilder
+    {
+        return $this->getOrCreateQueryBuilder($queryBuilder);
+    }
+
+    public function getOrCreateQueryBuilder(QueryBuilder $queryBuilder = null): QueryBuilder
+    {
+        return $queryBuilder ?: $this->createQueryBuilder('article');
+    }
 }

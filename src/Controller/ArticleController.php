@@ -3,9 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Article;
+use App\Repository\ArticleRepository;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ArticleController extends AbstractController
@@ -20,11 +23,9 @@ class ArticleController extends AbstractController
     /**
      * @Route("/", name="app_homepage")
      */
-    public function homepage(EntityManagerInterface $entityManager)
+    public function homepage(ArticleRepository $repository)
     {
-        $repository = $entityManager->getRepository(Article::class);
-
-        $articles = $repository->findBy([''], ['publishedAt' => 'DESC']);
+        $articles = $repository->findAlLPublishedOrderByNewst();
 
         return $this->render('article/homepage.html.twig', [
             'articles' => $articles,
@@ -34,14 +35,12 @@ class ArticleController extends AbstractController
     /**
      * @Route("/news/{slug}")
      */
-    public function show($slug, EntityManagerInterface $entityManager)
+    public function show($slug, EntityManagerInterface $entityManager): Response
     {
-        $repository = $entityManager->getRepository(Article::class);
+        /** @var Article $articles */
+        $articles = $entityManager->getRepository(Article::class)->findOneBy(['slug' => $slug]);
 
-        /** @var Article $article */
-        $article = $repository->findOneBy(['slug' => $slug]);
-
-        if (!$article) {
+        if (!$articles) {
             throw $this->createNotFoundException(sprintf('Article with slug "%s" not found.', $slug));
         }
 
@@ -52,7 +51,7 @@ class ArticleController extends AbstractController
         ];
 
         return $this->render('article/show.html.twig', [
-            'article' => $article,
+            'article' => $articles,
             'comments' => $comments,
         ]);
     }
@@ -60,14 +59,21 @@ class ArticleController extends AbstractController
     /**
      * @Route("/news/{slug}/heart", name="article_toggle_heart", methods={"POST"})
      */
-    public function toggleArticleHeart($slug, LoggerInterface $logger)
+    public function toggleArticleHeart(string $slug, LoggerInterface $logger, EntityManagerInterface $entityManager): Response
     {
-        // TODO - actually heart/un-heart the article
+        $article = $entityManager->getRepository(Article::class)->findOneBy(['slug' => $slug]);
 
-        $logger->info('Article is being hearted.');
+        if (!$article) {
+            return $this->json(['error' => 'Article not found'], Response::HTTP_NOT_FOUND);
+        }
+
+        $article->incrementHeartCount();
+        $entityManager->flush();
+
+        $logger->info(sprintf('Article "%s" has been hearted.', $article->getTitle()));
 
         return $this->json([
-            'hearts' => rand(5, 100),
+            'hearts' => $article->getHeartCount(),
         ]);
     }
 }
