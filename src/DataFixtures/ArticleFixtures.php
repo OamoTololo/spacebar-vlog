@@ -3,6 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Article;
+use App\Entity\Comment;
 use Doctrine\Persistence\ObjectManager;
 
 class ArticleFixtures extends AppFixtures
@@ -26,7 +27,7 @@ class ArticleFixtures extends AppFixtures
     ];
     protected function loadData(ObjectManager $manager)
     {
-        $this->createMany($manager, Article::class, function (Article $article, $count) {
+        $this->createMany($manager, Article::class, function (Article $article, $count) use ($manager) {
             $article
                 ->setTitle($this->faker->randomElement(self::$articleTitles))
                 ->setContent(<<<EOF
@@ -59,6 +60,28 @@ EOF
             if ($this->faker->boolean(70)) {
                 $article->setPublishedAt(\DateTimeImmutable::createFromMutable($this->faker->dateTimeBetween('-100 days', '-1 days')));
             }
+
+            $comment1 = new Comment();
+            $comment1->setAuthorName('Oamogetswe Mgidi');
+            $comment1->setContent('I ate a normal rock once. It did not taste like bacon.');
+            $comment1->setArticle($article);
+
+            $manager->persist($comment1);
+
+            $comment2 = new Comment();
+            $comment2->setAuthorName('Tshimologo Mgidi');
+            $comment2->setContent('Whoooo! I\'m going on an all-asteroids diet.');
+            $comment2->setArticle($article);
+
+            $manager->persist($comment2);
+
+            $comment3 = new Comment();
+            $comment3->setAuthorName('Tiisetso Kutumela');
+            $comment3->setContent('I like bacon too! Buy some from my site! oamogetswemgidi.com');
+            $comment3->setArticle($article);
+
+            $manager->persist($comment3);
+
 
         });
 
