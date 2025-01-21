@@ -35,12 +35,17 @@ class ArticleStatsCommand extends Command
 
         switch ($input->getOption('format')) {
             case 'text':
-                $io->listing($data);
+                $rows = [];
+                foreach ($data as $key => $value) {
+                    $rows[] = [$key, $value];
+                }
+                $io->table(['Key', 'Value'], $rows);
                 break;
-                case 'json':
-                    break;
-                    default:
-                        throw new \Exception('Unknown format');
+            case 'json':
+                $io->write(json_encode($data));
+                break;
+            default:
+                throw new \Exception('Unknown format');
         }
     }
 }
