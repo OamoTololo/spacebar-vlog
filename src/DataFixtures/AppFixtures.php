@@ -4,6 +4,7 @@ namespace App\DataFixtures;
 
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Faker\Generator;
 
 abstract class AppFixtures extends Fixture
 {
@@ -12,11 +13,17 @@ abstract class AppFixtures extends Fixture
      */
     private $manager;
 
+    /**
+     * @var Generator
+     */
+    protected $faker;
+
     abstract protected function loadData(ObjectManager $entityManager);
 
     public function load(ObjectManager $manager): void
     {
         $this->manager = $manager;
+        $this->faker = \Faker\Factory::create();
 
         $this->loadData($this->manager);
     }

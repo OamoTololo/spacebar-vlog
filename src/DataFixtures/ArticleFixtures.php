@@ -7,12 +7,28 @@ use Doctrine\Persistence\ObjectManager;
 
 class ArticleFixtures extends AppFixtures
 {
+    private static $articleTitles = [
+        'Why Asteroids Taste Like Bacon',
+        'Life on Planet Mercury: Tan, Relaxing and Fabulous',
+        'Light Speed Travel: Fountain of Youth or Fallacy',
+    ];
+
+    private static $articleImages = [
+        'asteroid.jpeg',
+        'mercury.jpeg',
+        'lightspeed.png',
+    ];
+
+    private static $articleAuthors = [
+        'Oamogetswe Mgidi',
+        'Tshimologo Mgidi',
+        'Tiisetso Kutumela',
+    ];
     protected function loadData(ObjectManager $manager)
     {
         $this->createMany($manager, Article::class, function (Article $article, $count) {
             $article
-                ->setTitle('Why Asteroids Taste Like Bacon')
-                ->setSlug('why-asteroids-like-bacon-'.$count)
+                ->setTitle($this->faker->randomElement(self::$articleTitles))
                 ->setContent(<<<EOF
 Spicy **jalapeno bacon** ipsum dolor amet veniam shank in dolore. Ham hock nisi landjaeger cow,
 lorem proident [beef ribs](https://baconipsum.com/) aute enim veniam ut cillum pork chuck picanha. Dolore reprehenderit
@@ -33,14 +49,15 @@ fugiat.
 EOF
                 )
             ;
+
             $article
-                ->setAuthor('Oamogetse Mgidi')
-                ->setHeartCount(rand(5, 100))
-                ->setImageFileName('lightspeed.png');
+                ->setAuthor($this->faker->randomElement(self::$articleAuthors))
+                ->setHeartCount($this->faker->numberBetween(5, 100))
+                ->setImageFileName($this->faker->randomElement(self::$articleImages));
 
             // publish most articles
-            if (rand(1, 100) > 2) {
-                $article->setPublishedAt(new \DateTimeImmutable(sprintf('-%d days', rand(1, 100)), new \DateTimeZone('UTC')));
+            if ($this->faker->boolean(70)) {
+                $article->setPublishedAt(\DateTimeImmutable::createFromMutable($this->faker->dateTimeBetween('-100 days', '-1 days')));
             }
 
         });
