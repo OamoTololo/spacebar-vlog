@@ -42,8 +42,12 @@ EOF
         ;
 
         // publish most articles
-        if (rand(1, 0) > 2) {
-            $article->setPublishedAt(new \DateTime(sprintf('-%d days', rand(1, 100))));
+        if (rand(1, 100) > 2) {
+            /** @var \DateTimeImmutable $date */
+            $date = new \DateTime(sprintf('-%d days', rand(1, 100)), new \DateTimeZone('UTC'));
+            $article->setPublishedAt($date);
+        } else {
+            $article->setPublishedAt(null); // Explicitly set to null for unpublished articles
         }
 
         $entityManager->persist($article); // Save this article
