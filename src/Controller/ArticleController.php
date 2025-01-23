@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Article;
 use App\Repository\ArticleRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -44,15 +43,8 @@ class ArticleController extends AbstractController
             throw $this->createNotFoundException(sprintf('Article with slug "%s" not found.', $slug));
         }
 
-        $comments = [
-            'I ate a normal rock once. It did not taste like bacon.',
-            'Whoooo! I\'m going on an all-asteroids diet.',
-            'I like bacon too! Buy some from my site! oamogetswemgidi.com',
-        ];
-
         return $this->render('article/show.html.twig', [
             'article' => $articles,
-            'comments' => $comments,
         ]);
     }
 
